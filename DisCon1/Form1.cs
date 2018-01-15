@@ -15,7 +15,10 @@ namespace DisCon1
     {
         OleDbConnection con = null;
         OleDbDataAdapter adapter = null;
+        OleDbDataAdapter adapterArtikel = null;
+        OleDbDataAdapter adapterGruppe = null;
         DataSet ds = null;
+        List<DisplayArtikel> lsArt = new List<DisplayArtikel>();
         public Form1()
         {
             InitializeComponent();
@@ -52,13 +55,43 @@ namespace DisCon1
         {
             //con = new OleDbConnection(Properties.Settings.Default.DBCon);
             adapter = new OleDbDataAdapter("select * from tArtikel", con);
-            adapter.Fill(ds, "Artikel");
+            //adapter.Fill(ds, "Artikel");
         }
         private void buttonArtikellesen_Click(object sender, EventArgs e)
         {
+            adapterArtikel = new OleDbDataAdapter("Select * from tArtikel;", con);
+            adapterArtikel.Fill(ds, "Artikel");
+            //DataTableReader reader = ds.Tables["Artikel"].CreateDataReader();
+            //dataGridViewAusgabe.DataSource = ds;
+            //dataGridViewAusgabe.DataMember = "Artikel";
+            adapterGruppe = new OleDbDataAdapter("Select * from tArtGruppe;",con);
+            adapterGruppe.Fill(ds, "ArtGruppe");
             DataTableReader reader = ds.Tables["Artikel"].CreateDataReader();
-            dataGridViewAusgabe.DataSource = ds;
-            dataGridViewAusgabe.DataMember = "Artikel";
+            while(reader.Read())
+            {
+                DisplayArtikel da = new DisplayArtikel();
+                da.ArtNr = reader.GetString(1);
+                da.Bezeichnung = reader.GetString(4);
+                da.ArtGruppe = GetArtGruppe(reader.GetInt32(3));
+                lsArt.Add(da);
+            }
+            dataGridViewAusgabe.DataSource = lsArt;
+        }
+
+        private string GetArtGruppe(int id)
+        {
+            String bez = "";
+            DataTableReader r = ds.Tables["Artikelgruppe"].CreateDataReader();
+            while(r.Read())
+            {
+                if(r.GetInt32(0) == id)
+                {
+                    bez = r.GetString(1);
+                    break;
+                }
+            } 
+
+            return bez;
         }
 
         private void buttonwrite_Click(object sender, EventArgs e)
