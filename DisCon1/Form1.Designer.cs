@@ -37,6 +37,7 @@
             this.buttonArtikellesen = new System.Windows.Forms.Button();
             this.buttonwrite = new System.Windows.Forms.Button();
             this.buttonread = new System.Windows.Forms.Button();
+            this.buttonDBsync = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAusgabe)).BeginInit();
             this.SuspendLayout();
             // 
@@ -127,11 +128,22 @@
             this.buttonread.UseVisualStyleBackColor = true;
             this.buttonread.Click += new System.EventHandler(this.buttonread_Click);
             // 
+            // buttonDBsync
+            // 
+            this.buttonDBsync.Location = new System.Drawing.Point(768, 243);
+            this.buttonDBsync.Name = "buttonDBsync";
+            this.buttonDBsync.Size = new System.Drawing.Size(118, 48);
+            this.buttonDBsync.TabIndex = 9;
+            this.buttonDBsync.Text = "DB-sync";
+            this.buttonDBsync.UseVisualStyleBackColor = true;
+            this.buttonDBsync.Click += new System.EventHandler(this.buttonDBsync_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(898, 518);
+            this.Controls.Add(this.buttonDBsync);
             this.Controls.Add(this.buttonread);
             this.Controls.Add(this.buttonwrite);
             this.Controls.Add(this.buttonArtikellesen);
@@ -159,6 +171,7 @@
         private System.Windows.Forms.Button buttonArtikellesen;
         private System.Windows.Forms.Button buttonwrite;
         private System.Windows.Forms.Button buttonread;
+        private System.Windows.Forms.Button buttonDBsync;
     }
 }
 

@@ -24,6 +24,10 @@ namespace DisCon1
             InitializeComponent();
             ds = new DataSet();
             con = new OleDbConnection(Properties.Settings.Default.DBCon);
+            adapterArtikel = new OleDbDataAdapter("Select * from tArtikel;", con);
+            adapterGruppe = new OleDbDataAdapter("Select * from tArtGruppe;", con);
+            adapterGruppe.FillSchema(ds, SchemaType.Source, "ArtGruppe");
+            adapterGruppe.Fill(ds, "ArtGruppe");
         }
 
         private void buttonDataAdapter_Click(object sender, EventArgs e)
@@ -59,51 +63,44 @@ namespace DisCon1
         }
         private void buttonArtikellesen_Click(object sender, EventArgs e)
         {
-            adapterArtikel = new OleDbDataAdapter("Select * from tArtikel;", con);
+            adapterArtikel.FillSchema(ds, SchemaType.Source, "Artikel");
+            ds.Tables["Artikel"].Columns[0].AutoIncrement = true; 
             adapterArtikel.Fill(ds, "Artikel");
-            //DataTableReader reader = ds.Tables["Artikel"].CreateDataReader();
-            //dataGridViewAusgabe.DataSource = ds;
-            //dataGridViewAusgabe.DataMember = "Artikel";
-            adapterGruppe = new OleDbDataAdapter("Select * from tArtGruppe;",con);
-            adapterGruppe.Fill(ds, "ArtGruppe");
+            dataGridViewAusgabe.DataSource = ds;
+            dataGridViewAusgabe.DataMember = "Artikel";
             DataTableReader reader = ds.Tables["Artikel"].CreateDataReader();
-            while(reader.Read())
+            while (reader.Read())
             {
-                DisplayArtikel da = new DisplayArtikel();
-                da.ArtNr = reader.GetString(1);
-                da.Bezeichnung = reader.GetString(4);
-                da.ArtGruppe = GetArtGruppe(reader.GetInt32(3));
-                lsArt.Add(da);
+                DisplayArtikel ds = new DisplayArtikel();
+                ds.ArtikelOid = reader.GetInt32(0);
+                ds.ArtNr = reader.GetString(1);
+                ds.Bezeichnung = reader.GetString(3);
+                ds.Meldebestand = reader.GetInt16(5);
+                ds.ArtGruppe = GetArtGruppe(reader.GetInt32(2));
+                ds.Bestand = reader.GetByte(4);
+                lsArt.Add(ds);
             }
             dataGridViewAusgabe.DataSource = lsArt;
         }
 
         private string GetArtGruppe(int id)
         {
-            String bez = "";
-            DataTableReader r = ds.Tables["Artikelgruppe"].CreateDataReader();
-            while(r.Read())
-            {
-                if(r.GetInt32(0) == id)
-                {
-                    bez = r.GetString(1);
-                    break;
-                }
-            } 
-
+            String bez = "xxx";
+            DataRow row = ds.Tables["ArtGruppe"].Rows.Find(id);
+            bez = (String)row[1];
             return bez;
         }
 
         private void buttonwrite_Click(object sender, EventArgs e)
         {
-            ds.WriteXml("Bestellung.xml");
+            ds.WriteXml("Bestellung.xml", XmlWriteMode.DiffGram);
             ds.WriteXmlSchema("Bestellung.xsd");
         }
 
         private void buttonread_Click(object sender, EventArgs e)
         {
             ds.ReadXmlSchema("Bestellung.xsd");
-            ds.ReadXml("Bestellung.xml");
+            ds.ReadXml("Bestellung.xml", XmlReadMode.DiffGram);
             dataGridViewAusgabe.DataSource = ds;
             dataGridViewAusgabe.DataMember = "Artikel";
             DataTableReader reader = ds.Tables["Kunde"].CreateDataReader();
@@ -114,6 +111,15 @@ namespace DisCon1
 
             }
             reader.Close();
+        }
+
+        private void buttonDBsync_Click(object sender, EventArgs e)
+        {
+            OleDbCommandBuilder builder = new OleDbCommandBuilder(adapterArtikel);
+            adapterArtikel.DeleteCommand = builder.GetDeleteCommand();
+            adapterArtikel.InsertCommand = builder.GetInsertCommand();
+            adapterArtikel.UpdateCommand = builder.GetUpdateCommand();
+            adapterArtikel.Update(ds.Tables["Artikel"]);
         }
     }
 }

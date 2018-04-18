@@ -12,6 +12,8 @@ namespace DisCon1
         String bezeichnung;
         String artGruppe;
 
+        public int ArtikelOid { get; set; }
+
         public string ArtNr
         {
             get
@@ -51,6 +53,9 @@ namespace DisCon1
             }
         }
 
+        public byte Bestand { get; set; }
+
+        public int Meldebestand { get; set; }
 
     }
 }
